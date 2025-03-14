@@ -18,10 +18,10 @@ buffer_size = fps * duration
 buffer = [None] * buffer_size
 index = 0
 lock = th.Lock()
+save_threads = []  # List to keep track of save threads
 
 # Function to save recent footage
 def save_recent_footage(frames_to_save):
-    # Filter out None entries (in case buffer isn't fully populated)
     frames = [f for f in frames_to_save if f is not None]
 
     if not frames:
@@ -29,7 +29,7 @@ def save_recent_footage(frames_to_save):
         return
 
     # Define video writer
-    height, width, layers = frames[0].shape
+    height, width, _ = frames[0].shape
     size = (width, height)
     date = dt.datetime.now().strftime("%Y%m%d_%H%M")
     out_path = os.path.join(output_dir, f"{date}.avi")
@@ -41,12 +41,11 @@ def save_recent_footage(frames_to_save):
 
     # Write frames to the video file
     for frame in frames:
-        # Encode frame as JPEG
         ret, jpeg = cv2.imencode('.jpg', frame)
         if ret:
-            # Decode JPEG back to frame
             frame = cv2.imdecode(jpeg, cv2.IMREAD_COLOR)
             out.write(frame)
+
     out.release()
     print(f"Recent footage saved to {out_path}.")
 
@@ -66,7 +65,6 @@ def capture_frames():
             break
 
         with lock:
-            # Store the frame in the buffer
             buffer[index] = frame
             index = (index + 1) % buffer_size
 
@@ -77,8 +75,7 @@ def capture_frames():
         key = cv2.waitKey(1) & 0xFF
         if key == ord('s'):
             with lock:
-                # Copy frames to a secondary buffer for saving
-                start = (index + 1) % buffer_size
+                start = index % buffer_size
                 frames_to_save = buffer[start:] + buffer[:start]
             save_thread = th.Thread(target=save_recent_footage, args=(frames_to_save,))
             save_thread.start()
@@ -90,15 +87,9 @@ def capture_frames():
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    # List to keep track of save threads
-    save_threads = []
-
-    # Start the frame capture in a separate thread
     print("Press 's' to save and 'q' to quit.")
     capture_thread = th.Thread(target=capture_frames)
     capture_thread.start()
-
-    # Wait for the capture thread to finish
     capture_thread.join()
 
     # Wait for all save threads to finish
