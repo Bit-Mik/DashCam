@@ -64,6 +64,9 @@ def capture_frames():
             print("Error: Unable to read frame.")
             break
 
+        # Mirror the frame horizontally
+        frame = cv2.flip(frame, 1)
+        
         with lock:
             buffer[index] = frame
             index = (index + 1) % buffer_size
