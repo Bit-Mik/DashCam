@@ -31,9 +31,9 @@ def save_recent_footage(frames_to_save):
     # Define video writer
     height, width, _ = frames[0].shape
     size = (width, height)
-    date = dt.datetime.now().strftime("%Y%m%d_%H%M")
-    out_path = os.path.join(output_dir, f"{date}.avi")
-    out = cv2.VideoWriter(out_path, cv2.VideoWriter_fourcc(*'XVID'), fps, size)
+    date = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    out_path = os.path.join(output_dir, f"{date}.mp4")
+    out = cv2.VideoWriter(out_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, size)
 
     if not out.isOpened():
         print("Error: Unable to open video writer.")
