@@ -45,13 +45,12 @@ dash-cam/
 ## How It Works
 - The script initializes a circular buffer with a size of `5 minutes * 30 FPS`.
 - Frames are continuously captured and stored in memory.
-- When 's' is pressed, the last 5 minutes of video is saved as an `.avi` file.
+- When 's' is pressed, the last 5 minutes of video is saved as an `.mp4` file.
 - When 'q' is pressed, the program stops.
 
 ## Possible Enhancements
 - **Increase FPS**: Modify `fps` for smoother video.
 - **Motion Detection**: Save frames only when motion is detected.
-- **Video Compression**: Use `.mp4` instead of `.avi` for better compression.
 - **Headless Mode**: Run without `cv2.imshow()` for server use.
 
 ## License
